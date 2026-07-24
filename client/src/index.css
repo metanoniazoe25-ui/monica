@@ -1,0 +1,157 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+  --color-hud-bg: #05080a;
+  --color-hud-panel: #071014;
+  --color-hud-cyan: #4dd8e6;
+  --color-hud-cyan-bright: #8ff2ff;
+  --color-hud-cyan-dim: #1c4a52;
+  --color-hud-border: #164048;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at top, #071316 0%, #030507 70%);
+  color: var(--color-hud-cyan);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-hud-cyan-dim);
+  color: var(--color-hud-cyan-bright);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-hud-cyan-dim);
+  border-radius: 3px;
+}
+
+.hud-panel {
+  position: relative;
+  background: linear-gradient(180deg, rgba(15, 40, 46, 0.35), rgba(4, 10, 12, 0.55));
+  border: 1px solid var(--color-hud-border);
+  backdrop-filter: blur(2px);
+}
+
+.hud-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+}
+.hud-corner::before,
+.hud-corner::after {
+  content: '';
+  position: absolute;
+  background: var(--color-hud-cyan);
+}
+.hud-corner-tl {
+  top: -1px;
+  left: -1px;
+}
+.hud-corner-tl::before {
+  width: 10px;
+  height: 2px;
+}
+.hud-corner-tl::after {
+  width: 2px;
+  height: 10px;
+}
+.hud-corner-br {
+  bottom: -1px;
+  right: -1px;
+}
+.hud-corner-br::before {
+  width: 10px;
+  height: 2px;
+  bottom: 0;
+  right: 0;
+}
+.hud-corner-br::after {
+  width: 2px;
+  height: 10px;
+  bottom: 0;
+  right: 0;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes spin-slow-reverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 18s linear infinite;
+}
+.animate-spin-slower {
+  animation: spin-slow-reverse 28s linear infinite;
+}
+
+@keyframes core-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+.animate-core-pulse {
+  animation: core-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+.animate-blink {
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes bar-bounce {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.animate-bar {
+  animation: bar-bounce 0.9s ease-in-out infinite;
+  transform-origin: center;
+}

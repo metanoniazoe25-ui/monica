@@ -1,0 +1,17 @@
+{
+  "name": "monica-server",
+  "version": "1.0.0",
+  "description": "Backend proxy for the M.O.N.I.C.A. AI assistant",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
