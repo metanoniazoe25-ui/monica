@@ -15,3 +15,23 @@ export interface LogEntry {
   time: string
   text: string
 }
+
+export type Provider = 'anthropic' | 'ollama'
+
+export interface ToolTrace {
+  tool: string
+  input?: unknown
+  ok: boolean
+  error?: string
+}
+
+export interface SpotifyNowPlaying {
+  playing: boolean
+  track?: string
+  artists?: string
+  album?: string
+  albumArt?: string | null
+  progressMs?: number
+  durationMs?: number
+  uri?: string
+}
