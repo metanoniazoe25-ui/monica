@@ -1,11 +1,8 @@
 import { Mic, MicOff, Power, Repeat, Volume2, VolumeX } from 'lucide-react'
 import { Panel } from './Panel'
-import type { Provider } from '../types'
 
 interface StatusPanelProps {
   model: string
-  provider: Provider
-  ollamaModel: string
   keyConfigured: boolean
   voiceOut: boolean
   autoListen: boolean
@@ -51,8 +48,6 @@ function ToggleButton({
 
 export function StatusPanel({
   model,
-  provider,
-  ollamaModel,
   keyConfigured,
   voiceOut,
   autoListen,
@@ -63,25 +58,17 @@ export function StatusPanel({
   onToggleListening,
   onReset,
 }: StatusPanelProps) {
-  const brainLabel = provider === 'ollama' ? ollamaModel || 'Hermes (local)' : 'Claude'
-  const readyLabel = provider === 'ollama' ? 'LOCAL' : keyConfigured ? 'CONFIGURED' : 'NOT SET'
-  const readyOk = provider === 'ollama' || keyConfigured
-
   return (
     <Panel category={model.toUpperCase()} tag="XXXXX-XXXX">
       <div className="mb-4 grid grid-cols-2 gap-4">
         <div>
-          <div className="text-[10px] tracking-widest text-hud-cyan/50">Brain</div>
-          <div className="truncate text-sm font-semibold text-hud-cyan-bright" title={brainLabel}>
-            {brainLabel}
-          </div>
+          <div className="text-[10px] tracking-widest text-hud-cyan/50">Model</div>
+          <div className="text-sm font-semibold text-hud-cyan-bright">{model}</div>
         </div>
         <div>
-          <div className="text-[10px] tracking-widest text-hud-cyan/50">
-            {provider === 'ollama' ? 'Runtime' : 'API Key'}
-          </div>
-          <div className={`text-sm font-semibold ${readyOk ? 'text-hud-cyan-bright' : 'text-amber-400'}`}>
-            {readyLabel}
+          <div className="text-[10px] tracking-widest text-hud-cyan/50">API Key</div>
+          <div className={`text-sm font-semibold ${keyConfigured ? 'text-hud-cyan-bright' : 'text-amber-400'}`}>
+            {keyConfigured ? 'CONFIGURED' : 'NOT SET'}
           </div>
         </div>
       </div>

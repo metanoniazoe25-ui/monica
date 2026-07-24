@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { TopBar } from './components/TopBar'
 import { VitalsPanel } from './components/VitalsPanel'
 import { ResourcesPanel } from './components/ResourcesPanel'
@@ -9,30 +9,13 @@ import { TerminalPanel } from './components/TerminalPanel'
 import { CorePanel } from './components/CorePanel'
 import { VoiceBar } from './components/VoiceBar'
 import { SettingsModal } from './components/SettingsModal'
-import { SpotifyPanel } from './components/SpotifyPanel'
 import { useAssistant } from './hooks/useAssistant'
 import { useSystemInfo } from './hooks/useSystemInfo'
-import { useSpotify } from './hooks/useSpotify'
 
 function App() {
   const assistant = useAssistant()
   const system = useSystemInfo()
-  const spotify = useSpotify(assistant.pushLog)
   const [settingsOpen, setSettingsOpen] = useState(false)
-
-  const handleSpotifyControl = useCallback(
-    (action: 'play' | 'pause' | 'next' | 'previous') => {
-      fetch(`/api/spotify/${action}`, { method: 'POST' })
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.error) assistant.pushLog(`Spotify ${action} failed: ${d.error}`)
-          else assistant.pushLog(`Spotify: ${action}`)
-          spotify.refreshStatus()
-        })
-        .catch(() => assistant.pushLog(`Spotify ${action} failed: request error`))
-    },
-    [assistant, spotify],
-  )
 
   return (
     <div className="mx-auto flex min-h-screen max-w-[1500px] flex-col gap-3 p-3 text-hud-cyan">
@@ -43,14 +26,6 @@ function App() {
           <VitalsPanel messages={assistant.messages} latencies={assistant.latencies} />
           <ResourcesPanel />
           <NetworkPanel />
-          <SpotifyPanel
-            configured={spotify.status.configured}
-            connected={spotify.status.connected}
-            nowPlaying={spotify.nowPlaying}
-            onConnect={spotify.connect}
-            onDisconnect={spotify.disconnect}
-            onControl={handleSpotifyControl}
-          />
         </div>
 
         <div className="flex flex-col gap-3 lg:col-span-6">
@@ -71,8 +46,6 @@ function App() {
         <div className="flex flex-col gap-3 lg:col-span-3">
           <StatusPanel
             model="M.O.N.I.C.A."
-            provider={assistant.provider}
-            ollamaModel={assistant.ollamaModel}
             keyConfigured={Boolean(assistant.apiKey) || assistant.hasServerKey}
             voiceOut={assistant.voiceOut}
             autoListen={assistant.autoListen}
@@ -92,13 +65,7 @@ function App() {
         <SettingsModal
           apiKey={assistant.apiKey}
           hasServerKey={assistant.hasServerKey}
-          onSaveApiKey={assistant.setApiKey}
-          provider={assistant.provider}
-          onSetProvider={assistant.setProvider}
-          ollamaUrl={assistant.ollamaUrl}
-          onSetOllamaUrl={assistant.setOllamaUrl}
-          ollamaModel={assistant.ollamaModel}
-          onSetOllamaModel={assistant.setOllamaModel}
+          onSave={assistant.setApiKey}
           onClose={() => setSettingsOpen(false)}
         />
       )}

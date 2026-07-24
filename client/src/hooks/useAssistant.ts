@@ -1,14 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { AssistantState, ChatMessage, LogEntry, Provider, ToolTrace } from '../types'
+import type { AssistantState, ChatMessage, LogEntry } from '../types'
 
 const API_KEY_STORAGE = 'monica.apiKey'
 const VOICE_OUT_STORAGE = 'monica.voiceOut'
 const AUTO_LISTEN_STORAGE = 'monica.autoListen'
-const PROVIDER_STORAGE = 'monica.provider'
-const OLLAMA_URL_STORAGE = 'monica.ollamaUrl'
-const OLLAMA_MODEL_STORAGE = 'monica.ollamaModel'
-
-const DEFAULT_OLLAMA_URL = 'http://localhost:11434'
 
 let logIdCounter = 0
 
@@ -26,13 +21,6 @@ export function useAssistant() {
   const [voiceOut, setVoiceOutState] = useState(() => localStorage.getItem(VOICE_OUT_STORAGE) !== 'off')
   const [autoListen, setAutoListenState] = useState(() => localStorage.getItem(AUTO_LISTEN_STORAGE) === 'on')
   const [latencies, setLatencies] = useState<number[]>([])
-  const [provider, setProviderState] = useState<Provider>(
-    () => (localStorage.getItem(PROVIDER_STORAGE) as Provider) || 'anthropic',
-  )
-  const [ollamaUrl, setOllamaUrlState] = useState(
-    () => localStorage.getItem(OLLAMA_URL_STORAGE) || DEFAULT_OLLAMA_URL,
-  )
-  const [ollamaModel, setOllamaModelState] = useState(() => localStorage.getItem(OLLAMA_MODEL_STORAGE) || '')
 
   const messagesRef = useRef<ChatMessage[]>([])
   const recognitionRef = useRef<SpeechRecognition | null>(null)
@@ -96,25 +84,6 @@ export function useAssistant() {
     [pushLog],
   )
 
-  const setProvider = useCallback(
-    (value: Provider) => {
-      setProviderState(value)
-      localStorage.setItem(PROVIDER_STORAGE, value)
-      pushLog(`AI brain switched to ${value === 'ollama' ? 'Hermes (local)' : 'Claude'}`)
-    },
-    [pushLog],
-  )
-
-  const setOllamaUrl = useCallback((value: string) => {
-    setOllamaUrlState(value)
-    localStorage.setItem(OLLAMA_URL_STORAGE, value)
-  }, [])
-
-  const setOllamaModel = useCallback((value: string) => {
-    setOllamaModelState(value)
-    localStorage.setItem(OLLAMA_MODEL_STORAGE, value)
-  }, [])
-
   const speak = useCallback(
     (text: string) => {
       if (!voiceOut || !supportsSynthesis || !text) {
@@ -165,19 +134,11 @@ export function useAssistant() {
           },
           body: JSON.stringify({
             messages: history.map(({ role, content }) => ({ role, content })),
-            provider,
-            ollamaUrl,
-            ollamaModel: ollamaModel || undefined,
           }),
         })
         const data = await res.json()
         const latency = Math.round(performance.now() - started)
         if (!res.ok) throw new Error(data.error || 'Request failed')
-
-        const trace = Array.isArray(data.trace) ? (data.trace as ToolTrace[]) : []
-        for (const t of trace) {
-          pushLog(t.ok ? `Tool used: ${t.tool}` : `Tool failed: ${t.tool} — ${t.error}`)
-        }
 
         const replyText = data.content || '…'
         const assistantMsg: ChatMessage = {
@@ -201,7 +162,7 @@ export function useAssistant() {
         setState('idle')
       }
     },
-    [apiKey, provider, ollamaUrl, ollamaModel, pushLog, speak],
+    [apiKey, pushLog, speak],
   )
 
   useEffect(() => {
@@ -294,12 +255,5 @@ export function useAssistant() {
     supportsRecognition,
     supportsSynthesis,
     reset,
-    provider,
-    setProvider,
-    ollamaUrl,
-    setOllamaUrl,
-    ollamaModel,
-    setOllamaModel,
-    pushLog,
   }
 }
